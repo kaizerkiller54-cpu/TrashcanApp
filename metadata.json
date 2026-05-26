@@ -1,0 +1,6 @@
+{
+  "name": "TrashCanApp",
+  "description": "Une application interactive de tri des déchets et de recyclage utilisant l'IA pour analyser vos photos de déchets prises par l'appareil photo et vous guider vers le bon geste écologique.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

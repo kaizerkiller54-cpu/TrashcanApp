@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation for UserProfile
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['userName', 'email', 'registeredAt'])
+        && data.keys().size() == 3
+        && data.userName is string
+        && data.userName.size() > 0
+        && data.userName.size() <= 128
+        && data.email is string
+        && data.email.size() > 0
+        && data.email.size() <= 320
+        && data.registeredAt is string
+        && data.registeredAt.size() > 0
+        && data.registeredAt.size() <= 40;
+    }
+
+    // Validation for Scan
+    function isValidScan(data) {
+      return data.keys().hasAll([
+        'name', 'category', 'ecoScore', 'binColor', 'binColorHex',
+        'recyclingMethod', 'preparatorySteps', 'environmentalImpact',
+        'estimatedBiodegradation', 'scannedAt'
+      ])
+      && data.keys().size() == 10
+      && data.name is string && data.name.size() > 0 && data.name.size() <= 150
+      && data.category is string && data.category.size() > 0 && data.category.size() <= 50
+      && data.ecoScore is string && data.ecoScore.size() == 1
+      && data.binColor is string && data.binColor.size() > 0 && data.binColor.size() <= 50
+      && data.binColorHex is string && data.binColorHex.size() > 0 && data.binColorHex.size() <= 50
+      && data.recyclingMethod is string && data.recyclingMethod.size() > 0 && data.recyclingMethod.size() <= 2000
+      && data.environmentalImpact is string && data.environmentalImpact.size() > 0 && data.environmentalImpact.size() <= 2000
+      && data.estimatedBiodegradation is string && data.estimatedBiodegradation.size() > 0 && data.estimatedBiodegradation.size() <= 100
+      && data.scannedAt is string && data.scannedAt.size() > 0 && data.scannedAt.size() <= 40
+      && data.preparatorySteps is list
+      && data.preparatorySteps.size() <= 10
+      && (data.preparatorySteps.size() == 0 || data.preparatorySteps[0] is string);
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUserProfile(incoming());
+      allow update: if isOwner(userId)
+        && isValidUserProfile(incoming())
+        && incoming().email == existing().email
+        && incoming().registeredAt == existing().registeredAt
+        && incoming().diff(existing()).affectedKeys().hasOnly(['userName']);
+      allow delete: if isOwner(userId);
+
+      // Scans Subcollection can be created and deleted by the user
+      match /scans/{scanId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(scanId) && isValidScan(incoming());
+        allow update: if false; // Immutable histórico
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

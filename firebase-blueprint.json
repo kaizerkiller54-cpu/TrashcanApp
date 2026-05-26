@@ -1,0 +1,96 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Profil utilisateur contenant le nom public et l'email.",
+      "type": "object",
+      "properties": {
+        "userName": {
+          "type": "string",
+          "description": "Nom ou pseudonyme écologique choisi par l'utilisateur."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Adresse email de l'utilisateur."
+        },
+        "registeredAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date d'inscription de l'utilisateur."
+        }
+      },
+      "required": ["userName", "email", "registeredAt"]
+    },
+    "Scan": {
+      "title": "Scan",
+      "description": "Un enregistrement d'analyse d'un déchet identifié par l'I.A.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Nom du déchet identifié."
+        },
+        "category": {
+          "type": "string",
+          "description": "Catégorie de déchet."
+        },
+        "ecoScore": {
+          "type": "string",
+          "description": "Éco-Score de recyclabilité (A à E)."
+        },
+        "binColor": {
+          "type": "string",
+          "description": "Nom du bac recommandé."
+        },
+        "binColorHex": {
+          "type": "string",
+          "description": "Couleur hexadécimale associée."
+        },
+        "recyclingMethod": {
+          "type": "string",
+          "description": "Instruction de recyclage."
+        },
+        "preparatorySteps": {
+          "type": "array",
+          "description": "Étapes de tri recommandées."
+        },
+        "environmentalImpact": {
+          "type": "string",
+          "description": "Impact et statistique environnementale."
+        },
+        "estimatedBiodegradation": {
+          "type": "string",
+          "description": "Durée estimée de décomposition dans la nature."
+        },
+        "scannedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Instant où la photo a été analysée."
+        }
+      },
+      "required": [
+        "name",
+        "category",
+        "ecoScore",
+        "binColor",
+        "binColorHex",
+        "recyclingMethod",
+        "preparatorySteps",
+        "environmentalImpact",
+        "estimatedBiodegradation",
+        "scannedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Profils individuels des éco-citoyens."
+    },
+    "/users/{userId}/scans/{scanId}": {
+      "schema": "Scan",
+      "description": "Historique des scans collectés par les utilisateurs."
+    }
+  }
+}

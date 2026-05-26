@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">TrashCanApp</string>
+    <string name="title_activity_main">TrashCanApp</string>
+    <string name="package_name">com.trashcanapp.app</string>
+    <string name="custom_url_scheme">com.trashcanapp.app</string>
+</resources>
