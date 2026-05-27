@@ -930,6 +930,43 @@ export default function App() {
                   </button>
                 </div>
 
+                {/* ===== PROFIL NATIF - CONNEXION RAPIDE PROPRIÉTAIRE ===== */}
+                {authMode === "login" && import.meta.env.VITE_OWNER_EMAIL && import.meta.env.VITE_OWNER_EMAIL !== "votre-email@exemple.com" && (
+                  <div className={`mt-4 p-3 rounded-xl border ${
+                    theme === "vert"
+                      ? "bg-emerald-950/60 border-emerald-700/60"
+                      : "bg-slate-100 border-slate-200"
+                  }`}>
+                    <p className={`text-[9px] font-mono uppercase tracking-widest mb-2 text-center opacity-60`}>
+                      ⚡ Accès Propriétaire
+                    </p>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setAuthError(null);
+                        setAuthSuccess(null);
+                        const ownerEmail = import.meta.env.VITE_OWNER_EMAIL;
+                        const ownerPassword = import.meta.env.VITE_OWNER_PASSWORD;
+                        if (!ownerEmail || !ownerPassword) return;
+                        try {
+                          const { signInWithEmailAndPassword: signIn } = await import("firebase/auth");
+                          await signIn(auth, ownerEmail, ownerPassword);
+                          setAuthSuccess("Connexion rapide réussie !");
+                        } catch (err: any) {
+                          setAuthError("Connexion rapide échouée. Vérifiez vos identifiants dans le fichier .env");
+                        }
+                      }}
+                      className={`w-full py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
+                        theme === "vert"
+                          ? "bg-emerald-700 hover:bg-emerald-600 text-emerald-100"
+                          : "bg-emerald-600 hover:bg-emerald-500 text-white"
+                      }`}
+                    >
+                      <Key className="w-3.5 h-3.5" />
+                      Se connecter en tant que propriétaire
+                    </button>
+                  </div>
+                )}
 
               </motion.div>
             ) : (
